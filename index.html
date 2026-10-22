@@ -1,0 +1,242 @@
+<title>ヨミスギ</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700&family=M+PLUS+1+Code:wght@500&display=swap">
+<style>
+
+/* Layout: one phone-width column — mode tabs, a messaging-app screen, controls below */
+:root{
+  --bg:#eef0f3; --sheet:#ffffff; --fg:#1d2230; --muted:#6b7282; --line:#c4c8d0;
+  --talk:#8aa6cf; --head:#2b3445; --headfg:#ffffff;
+  --mine:#8de055; --minefg:#13200a; --theirs:#ffffff; --theirsfg:#1d2230; --time:#eef3fb;
+  --kb:#d3d6dc; --key:#ffffff; --keyfg:#1d2230;
+  --mark:#ffe14d; --accent:#2c5bd9; --good:#1f9d55; --bad:#d6453d; --warn:#c77700;
+  --display:"Dela Gothic One","Hiragino Sans","Noto Sans JP",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Noto Sans JP",sans-serif;
+  --ui:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;
+  --mono:"M PLUS 1 Code",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#13161d; --sheet:#1d212b; --fg:#eef0f5; --muted:#9aa1b2; --line:#3c4252;
+  --talk:#1e2533; --head:#151a24; --headfg:#eef0f5;
+  --mine:#5fb63a; --minefg:#0c1606; --theirs:#323a4a; --theirsfg:#eef0f5; --time:#8f99ad;
+  --kb:#2a2f3b; --key:#454c5e; --keyfg:#eef0f5;
+  --mark:#c9a600; --accent:#7ea2ff; --good:#4cc47f; --bad:#ff7a70; --warn:#f0a83a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#13161d; --sheet:#1d212b; --fg:#eef0f5; --muted:#9aa1b2; --line:#3c4252;
+  --talk:#1e2533; --head:#151a24; --headfg:#eef0f5;
+  --mine:#5fb63a; --minefg:#0c1606; --theirs:#323a4a; --theirsfg:#eef0f5; --time:#8f99ad;
+  --kb:#2a2f3b; --key:#454c5e; --keyfg:#eef0f5;
+  --mark:#c9a600; --accent:#7ea2ff; --good:#4cc47f; --bad:#ff7a70; --warn:#f0a83a; color-scheme:dark}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 32px}
+.wrap{max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+h1{font-family:var(--display);font-weight:400;font-size:2rem;margin:0;letter-spacing:.02em}
+h1 span{background:linear-gradient(transparent 62%,var(--mark) 62%);color:var(--fg)}
+.tag{font-size:.8rem;color:var(--muted)}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:4px}
+.tabs button{font:700 .9rem var(--body);border:0;border-radius:10px;padding:10px 6px;background:transparent;color:var(--muted);cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--fg);color:var(--bg)}
+.mission{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.mission b{font-size:1.05rem;line-height:1.5}
+.mission .lbl{font-size:.72rem;color:var(--muted);letter-spacing:.08em}
+.copy{font-family:var(--display);font-size:1rem;line-height:1.5}
+
+.phone{border-radius:26px;overflow:hidden;border:1px solid var(--line);font-family:var(--ui);background:var(--talk)}
+.top{background:var(--head);color:var(--headfg);display:flex;align-items:center;gap:10px;padding:12px 14px}
+.top .back{font-size:1.3rem;line-height:1;opacity:.9}
+.top .name{flex:1;font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.top .icons{display:flex;gap:14px;opacity:.85}
+.top svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8}
+.talk{padding:12px 12px 16px;display:flex;flex-direction:column;gap:10px;min-height:170px;justify-content:flex-end}
+.day{align-self:center;font-size:.7rem;color:var(--headfg);background:color-mix(in srgb,var(--head) 45%,transparent);padding:3px 10px;border-radius:10px}
+.msg{display:flex;gap:6px;align-items:flex-end;max-width:100%}
+.msg.mine{flex-direction:row-reverse}
+.av{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:700;color:#fff;align-self:flex-start}
+.who{font-size:.7rem;color:var(--time);margin:0 0 3px 2px}
+.bub{padding:8px 12px;border-radius:18px;font-size:.95rem;line-height:1.45;word-break:break-all;min-width:0;max-width:250px}
+.theirs .bub{background:var(--theirs);color:var(--theirsfg);border-top-left-radius:4px}
+.mine .bub{background:var(--mine);color:var(--minefg);border-top-right-radius:4px}
+.meta{font-size:.62rem;color:var(--time);white-space:nowrap;line-height:1.3;text-align:right}
+.theirs .meta{text-align:left}
+.sent{animation:send .35s ease-out}
+@keyframes send{from{transform:translateY(14px);opacity:0}}
+.inbar{background:var(--sheet);display:flex;align-items:center;gap:10px;padding:8px 10px;border-top:1px solid var(--line)}
+.inbar svg{width:22px;height:22px;stroke:var(--muted);fill:none;stroke-width:1.8;flex:none}
+.input{flex:1;min-width:0;background:var(--bg);border-radius:18px;padding:8px 12px;font-size:1rem;line-height:1.4;min-height:1.4em;word-break:break-all;color:var(--fg)}
+.kana{text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:4px;background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.caret{display:inline-block;width:2px;height:1.1em;background:var(--accent);vertical-align:-3px;margin-left:1px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.ph{color:var(--muted)}
+.bar{background:var(--kb);padding:8px;display:flex;flex-wrap:wrap;gap:6px;min-height:38px}
+.bar::-webkit-scrollbar{display:none}
+.cand{flex:none;font:inherit;background:var(--key);color:var(--keyfg);border:0;border-radius:7px;padding:8px 12px;font-size:1rem;box-shadow:0 1px 0 rgba(0,0,0,.18);white-space:nowrap}
+button.cand{cursor:pointer}
+button.cand:active{transform:translateY(1px)}
+.pop{animation:pop .25s ease-out}
+@keyframes pop{from{transform:translateY(6px);opacity:.3}}
+.keys{position:relative;background:var(--kb);display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:0 8px 10px}
+.keys span{background:var(--key);color:var(--keyfg);border-radius:7px;text-align:center;padding:9px 0;font-size:.95rem;box-shadow:0 1px 0 rgba(0,0,0,.18);opacity:.75}
+.keys span.fn{font-size:.75rem;display:grid;place-items:center}
+.keys.broken span{opacity:.3}
+.broken-tag{position:absolute;inset:0 8px 10px;display:grid;place-items:center;font:700 .9rem var(--body);color:var(--bad);letter-spacing:.1em}
+.broken-tag i{font-style:normal;background:var(--sheet);border:2px solid var(--bad);border-radius:8px;padding:4px 12px;transform:rotate(-4deg)}
+
+.ctrl{display:grid;grid-template-columns:1fr 2fr;gap:8px}
+.more,.undo{font:700 1rem var(--body);border:2px dashed var(--line);background:transparent;color:var(--fg);border-radius:14px;padding:12px;cursor:pointer}
+.more:disabled,.undo:disabled,.send:disabled{opacity:.4;cursor:default}
+.send,.next{font:700 1rem var(--body);background:var(--fg);color:var(--bg);border:0;border-radius:14px;padding:12px 18px;cursor:pointer}
+.stat{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted)}
+.stat b{font-family:var(--mono);color:var(--fg)}
+.q{font-size:.85rem;color:var(--muted);margin:2px 0 -4px;display:flex;justify-content:space-between;gap:8px}
+.choices{display:grid;gap:8px}
+.ch{font:500 1rem var(--body);text-align:left;background:var(--sheet);color:var(--fg);border:1.5px solid var(--line);border-radius:14px;padding:13px 14px;cursor:pointer;line-height:1.4}
+.ch:hover:not(:disabled){border-color:var(--fg)}
+.ch:disabled{cursor:default}
+.ch.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--sheet))}
+.ch.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 12%,var(--sheet))}
+.ch.dim{opacity:.45}
+.miss{color:var(--bad);font-weight:700}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}50%{transform:translateX(5px)}75%{transform:translateX(-3px)}}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.result{display:flex;flex-direction:column;gap:10px;background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:14px}
+.result .head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.verdict{font-family:var(--display);font-size:1.5rem}
+.verdict.ok{color:var(--good)} .verdict.ng{color:var(--bad)} .verdict.leak{color:var(--warn)}
+.result p{margin:0;font-size:.9rem;line-height:1.6}
+@media (prefers-reduced-motion:reduce){.caret,.pop,.sent,.shake{animation:none}}
+
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.count{font-family:var(--mono);font-size:.9rem}
+.count b{font-size:1.3rem}
+.lead{font-size:.85rem;color:var(--muted);line-height:1.7;margin:0}
+.endcard{display:flex;flex-direction:column;gap:6px;background:var(--sheet);border:2px solid var(--fg);border-radius:16px;padding:14px 16px;animation:send .35s ease-out}
+.endcard .no{font-family:var(--mono);font-size:.8rem;color:var(--muted);display:flex;justify-content:space-between}
+.endcard .new{color:var(--bg);background:var(--bad);border-radius:6px;padding:1px 8px;font-family:var(--body);font-weight:700}
+.endcard .title{font-family:var(--display);font-size:1.6rem;line-height:1.2}
+.endcard .title.good{color:var(--good)}
+.endcard p{margin:0;font-size:.85rem;color:var(--muted);line-height:1.6}
+.gallery h2{font-size:.9rem;margin:6px 0 8px;display:flex;justify-content:space-between}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.slot{background:var(--sheet);border:1px solid var(--line);border-radius:10px;padding:8px;min-height:62px;display:flex;flex-direction:column;gap:2px}
+.slot .n{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
+.slot .t{font-size:.82rem;font-weight:700;line-height:1.3}
+.slot.lock{background:transparent;border-style:dashed}
+.slot.lock .t{color:var(--muted);letter-spacing:.2em}
+.slot.just{border-color:var(--bad);box-shadow:0 0 0 2px color-mix(in srgb,var(--bad) 30%,transparent)}
+button.slot{font:inherit;color:var(--fg);text-align:left;cursor:pointer}
+.slot.sel{border:2px solid var(--fg)}
+.hint{margin-top:8px;background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;font-size:.9rem;line-height:1.5;min-height:2.6em}
+.hint .lbl{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.reset{font:500 .75rem var(--body);background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0}
+.ctrl1{display:grid;grid-template-columns:1fr 2fr;gap:8px}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1><span>ヨミスギ</span></h1>
+    <div class="count" id="count"></div>
+  </header>
+  <p class="lead">キーボードが壊れて、予測変換しか押せない。しかもこのスマホは予測しすぎる。返信して、全部のエンディングを見つけよう。</p>
+  <div class="tabs" role="tablist" id="tabs"></div>
+  <main id="game"></main>
+  <section class="gallery">
+    <h2><span>エンディング図鑑</span><button class="reset" id="reset">この相手の記録を消す</button></h2>
+    <div class="grid" id="grid"></div>
+    <div class="hint" id="hint" aria-live="polite"></div>
+  </section>
+</div>
+
+<script>
+const ICON={
+ search:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="M20 20l-4.5-4.5"/></svg>',
+ call:'<svg viewBox="0 0 24 24"><path d="M6 3h3l2 5-2.5 1.5a11 11 0 005 5L15 12l5 2v3a3 3 0 01-3 3A15 15 0 013 6a3 3 0 013-3z"/></svg>',
+ menu:'<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+ plus:'<svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>',
+ cam:'<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="12" cy="13.5" r="3.5"/><path d="M9 7l1.5-2.5h3L15 7"/></svg>',
+ img:'<svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg>'
+};
+const KEYS=["☆123","あ","か","さ","⌫","ABC","た","な","は","空白","あいう","ま","や","ら","改行"];
+const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+
+// ステージの中身は data/stages/*.json にある。順番は data/stages.json の order。
+let STAGES=[];
+async function loadStages(){
+  const {order}=await (await fetch("data/stages.json")).json();
+  STAGES=await Promise.all(order.map(async id=>{
+    const d=await (await fetch(`data/stages/${id}.json`)).json();
+    return {...d,E:d.endings.map(e=>[e.title,e.reply,e.comment,e.hint,e.good]),N:d.nodes};
+  }));
+}
+
+let st=0,path=["s"],done=null,isNew=false,sel=null,found=[];
+const keyOf=i=>"yomisugi-endings-"+STAGES[i].id;
+const initFound=()=>STAGES.forEach((S,i)=>{let f=[];try{f=JSON.parse(localStorage.getItem(keyOf(i))||"[]")}catch(e){}found[i]=new Set(f)});
+const save=()=>{try{localStorage.setItem(keyOf(st),JSON.stringify([...found[st]]))}catch(e){}};
+const game=document.getElementById("game");
+
+function bubble(m){
+  if(m.mine) return `<div class="msg mine ${m.cls||""}"><div class="bub">${esc(m.t)}</div><div class="meta">${m.read?"既読<br>":""}${m.at}</div></div>`;
+  return `<div class="msg theirs ${m.cls||""}"><div class="av" style="background:${m.c}">${esc(m.who[0])}</div>
+    <div style="min-width:0"><div class="who">${esc(m.who)}</div><div style="display:flex;gap:6px;align-items:flex-end"><div class="bub">${esc(m.t)}</div><div class="meta">${m.at}</div></div></div></div>`;
+}
+const no=i=>"END "+String(i+1).padStart(2,"0");
+function drawTabs(){
+  document.getElementById("tabs").innerHTML=STAGES.map((S,i)=>`<button role="tab" aria-selected="${i===st}" data-i="${i}">${esc(S.tab)}　${found[i].size}/${S.E.length}</button>`).join("");
+  document.querySelectorAll("#tabs button").forEach(b=>b.onclick=()=>{st=+b.dataset.i;path=["s"];done=null;sel=null;render(false)});
+}
+function drawGallery(){
+  const S=STAGES[st],F=found[st];
+  const tot=STAGES.reduce((a,s,i)=>a+found[i].size,0),all=STAGES.reduce((a,s)=>a+s.E.length,0);
+  document.getElementById("count").innerHTML=`<b>${tot}</b> / ${all}`;
+  document.getElementById("grid").innerHTML=S.E.map((e,i)=>{
+    const got=F.has(i),just=done!=null&&S.N[path.at(-1)].e===i;
+    return `<button class="slot ${got?"":"lock"} ${just?"just":""} ${sel===i?"sel":""}" data-i="${i}"><span class="n">${no(i)}</span><span class="t">${got?esc(e[0]):"？？？"}</span></button>`}).join("");
+  const h=document.getElementById("hint");
+  if(sel==null)h.innerHTML='<span class="tag">枠をタップすると、ヒントや相手の返信が見られます</span>';
+  else if(F.has(sel))h.innerHTML=`<span class="lbl">${no(sel)}　${esc(S.E[sel][0])}</span><span>${esc(S.who)}「${esc(S.E[sel][1])}」</span>`;
+  else h.innerHTML=`<span class="lbl">${no(sel)}　ヒント</span><span>${esc(S.E[sel][3])}</span>`;
+  document.querySelectorAll("#grid .slot").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel=sel===i?null:i;drawGallery()});
+}
+function render(pop){
+  const S=STAGES[st],node=S.N[path.at(-1)],P={who:S.who,c:S.color};
+  let log=bubble({...P,t:S.ask,at:S.askAt});
+  if(done!=null){
+    log+=bubble({mine:true,t:node.t,at:S.sentAt,read:true,cls:"sent"});
+    log+=bubble({...P,t:S.E[node.e][1],at:S.sentAt,cls:"sent"});
+  }
+  const input=done!=null?'<span class="ph">メッセージを入力</span>':esc(node.t)+'<span class="caret"></span>';
+  const bar=done!=null?"":(node.c||[]).map((c,i)=>`<button class="cand ${pop?"pop":""}" data-i="${i}">${esc(c[0])}</button>`).join("")||'<span class="tag" style="padding:8px">これ以上の候補はありません</span>';
+  let below;
+  if(done!=null){
+    const e=S.E[node.e],complete=found[st].size===S.E.length;
+    below=`<div class="endcard"><div class="no"><span>${no(node.e)}</span>${isNew?'<span class="new">NEW</span>':'<span>発見済み</span>'}</div>
+      <div class="title ${e[4]?"good":""}">${esc(e[0])}</div><p>${esc(e[2])}</p>
+      <button class="next" id="retry">${complete?"この相手は全エンディング達成！もう一度":"別の返信をしてみる"}</button></div>`;
+  }else{
+    below=`<div class="ctrl1"><button class="undo" id="undo" ${path.length<2?"disabled":""}>⌫ 戻す</button>
+      <button class="send" id="send" ${node.t?"":"disabled"}>この文で送信</button></div>`;
+  }
+  game.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px"><div class="phone">
+    <div class="top"><span class="back">‹</span><span class="name">${esc(S.who)}</span><span class="icons">${ICON.search}${ICON.call}${ICON.menu}</span></div>
+    <div class="talk"><span class="day">今日</span>${log}</div>
+    <div class="inbar">${ICON.plus}${ICON.cam}${ICON.img}<div class="input" aria-label="入力中の文字">${input}</div></div>
+    <div class="bar" aria-label="予測変換の候補">${bar}</div>
+    <div class="keys broken" aria-hidden="true">${KEYS.map(k=>`<span class="${k.length>1?"fn":""}">${k}</span>`).join("")}<div class="broken-tag"><i>キーボード故障中</i></div></div>
+  </div>${below}</div>`;
+  drawTabs();drawGallery();
+  game.querySelectorAll(".bar .cand").forEach(b=>b.onclick=()=>{path.push(node.c[+b.dataset.i][1]);render(true)});
+  const u=document.getElementById("undo");if(u)u.onclick=()=>{path.pop();render(true)};
+  const s=document.getElementById("send");if(s)s.onclick=()=>{done=node.e;isNew=!found[st].has(node.e);found[st].add(node.e);save();render(false)};
+  const r=document.getElementById("retry");if(r)r.onclick=()=>{path=["s"];done=null;render(true)};
+}
+let armed=false;
+document.getElementById("reset").onclick=e=>{
+  if(!armed){armed=true;e.target.textContent="本当に消す？もう一度押す";setTimeout(()=>{armed=false;e.target.textContent="この相手の記録を消す"},3000);return}
+  armed=false;e.target.textContent="この相手の記録を消す";found[st]=new Set();save();path=["s"];done=null;sel=null;render(false);
+};
+loadStages().then(()=>{initFound();render(false)}).catch(err=>{
+  game.innerHTML=`<div class="result"><p>ステージのデータを読み込めませんでした。ファイルを直接開いている場合は、README の「手元で動かす」の手順でローカルサーバーから開いてください。</p><p class="tag">${esc(String(err))}</p></div>`;
+});
+</script>
