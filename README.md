@@ -10,6 +10,7 @@ index.html              ゲーム本体（見た目と動き）。ネタの追�
 data/stages.json        ステージの並び順
 data/stages/mom.json    ステージ1：お母さん
 data/stages/boss.json   ステージ2：佐藤部長
+data/stages/ex.json     ステージ3：元カノ
 scripts/check.mjs       データの自動チェック
 CLAUDE.md               Claude Code 向けの作業ルール
 ```
