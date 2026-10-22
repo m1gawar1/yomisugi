@@ -9,3 +9,5 @@ desktop.ini
 node_modules/
 *.log
 .env*
+# 確認用スクリーンショット
+screenshots/
