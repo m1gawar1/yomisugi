@@ -10,14 +10,16 @@
 - [x] ステージ2：佐藤部長（END 20個）
 - [x] データ自動チェック（scripts/check.mjs）
 - [x] GitHub リポジトリ作成（m1gawar1/yomisugi）・GitHub Pages 公開
+- [x] 結果シェアボタン（共有シート／クリップボード）
 
 ## 作業中
 - [ ] スマホ実機での遊び心地チェック
 
 ## 次にやること
-- [ ] ステージを増やして10問パックにする
-- [ ] 送った文をスマホが学習する仕組み（ほかのステージの予測変換に出る言葉 5〜6個）
-- [ ] 結果をシェアできるようにする
+- [ ] index.html に doctype・charset・viewport の meta を追加（スマホ表示崩れ対策）
+- [ ] OGP（リンクを貼ったときのカード表示）
+- [ ] ステージを3〜5に増やす → 最終的に10問パック（タブの横スクロール対応も）
+- [ ] 送った文をスマホが学習する仕組み（ステージ4〜5個になってから。設計案は ~/.claude/plans/staged-wiggling-cascade.md）
 
 ## メモ
 - 公開URL: https://m1gawar1.github.io/yomisugi/

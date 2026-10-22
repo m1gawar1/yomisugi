@@ -213,7 +213,8 @@ function render(pop){
     const e=S.E[node.e],complete=found[st].size===S.E.length;
     below=`<div class="endcard"><div class="no"><span>${no(node.e)}</span>${isNew?'<span class="new">NEW</span>':'<span>発見済み</span>'}</div>
       <div class="title ${e[4]?"good":""}">${esc(e[0])}</div><p>${esc(e[2])}</p>
-      <button class="next" id="retry">${complete?"この相手は全エンディング達成！もう一度":"別の返信をしてみる"}</button></div>`;
+      <div class="ctrl1"><button class="undo" id="share">シェア</button>
+      <button class="next" id="retry">${complete?"この相手は全エンディング達成！もう一度":"別の返信をしてみる"}</button></div></div>`;
   }else{
     below=`<div class="ctrl1"><button class="undo" id="undo" ${path.length<2?"disabled":""}>⌫ 戻す</button>
       <button class="send" id="send" ${node.t?"":"disabled"}>この文で送信</button></div>`;
@@ -230,6 +231,10 @@ function render(pop){
   const u=document.getElementById("undo");if(u)u.onclick=()=>{path.pop();render(true)};
   const s=document.getElementById("send");if(s)s.onclick=()=>{done=node.e;isNew=!found[st].has(node.e);found[st].add(node.e);save();render(false)};
   const r=document.getElementById("retry");if(r)r.onclick=()=>{path=["s"];done=null;render(true)};
+  // シェア：共有シートが使えれば共有、だめ/未対応ならクリップボードにコピー
+  const sh=document.getElementById("share");if(sh)sh.onclick=async()=>{const e=S.E[node.e],text=`ヨミスギ｜${S.who}に返信したら ${no(node.e)}「${e[0]}」（${found[st].size}/${S.E.length}）`,url=location.origin+location.pathname,flash=m=>{sh.textContent=m;setTimeout(()=>{sh.textContent="シェア"},2000)};
+    try{if(navigator.share){await navigator.share({text,url});return}}catch(err){if(err&&err.name==="AbortError")return}
+    try{await navigator.clipboard.writeText(text+" "+url);flash("コピーしました")}catch(err){flash("コピーできませんでした")}};
 }
 let armed=false;
 document.getElementById("reset").onclick=e=>{
