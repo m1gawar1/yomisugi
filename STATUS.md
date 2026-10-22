@@ -11,12 +11,13 @@
 - [x] データ自動チェック（scripts/check.mjs）
 - [x] GitHub リポジトリ作成（m1gawar1/yomisugi）・GitHub Pages 公開
 - [x] 結果シェアボタン（共有シート／クリップボード）
+- [x] index.html に doctype・charset・viewport を追加（スマホ表示対策）
 
 ## 作業中
 - [ ] スマホ実機での遊び心地チェック
 
 ## 次にやること
-- [ ] index.html に doctype・charset・viewport の meta を追加（スマホ表示崩れ対策）
+
 - [ ] OGP（リンクを貼ったときのカード表示）
 - [ ] ステージを3〜5に増やす → 最終的に10問パック（タブの横スクロール対応も）
 - [ ] 送った文をスマホが学習する仕組み（ステージ4〜5個になってから。設計案は ~/.claude/plans/staged-wiggling-cascade.md）
