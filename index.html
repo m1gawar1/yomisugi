@@ -104,6 +104,8 @@ h1 span{background:linear-gradient(transparent 62%,var(--mark) 62%);color:var(--
 .cand{flex:none;font:inherit;background:var(--key);color:var(--keyfg);border:0;border-radius:7px;padding:8px 12px;min-height:44px;font-size:1rem;box-shadow:0 1px 0 rgba(0,0,0,.18);white-space:nowrap}
 button.cand{cursor:pointer}
 button.cand:active{transform:translateY(1px)}
+.cand.learn{background:color-mix(in srgb,var(--accent) 16%,var(--key));box-shadow:inset 0 0 0 2px var(--accent),0 1px 0 rgba(0,0,0,.18)}
+.cand .lt{display:inline-block;margin-left:6px;padding:0 5px;border-radius:5px;background:var(--accent);color:var(--sheet);font:700 .62rem/1.6 var(--ui);vertical-align:2px}
 .pop{animation:pop .25s ease-out}
 @keyframes pop{from{transform:translateY(6px);opacity:.3}}
 .keys{flex:none;position:relative;background:var(--kb);display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:0 max(8px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
@@ -160,6 +162,7 @@ dialog.sheet[open]::backdrop{animation:fade .28s ease-out}
 .res .title{font-family:var(--display);font-weight:400;font-size:1.6rem;line-height:1.3;margin:0}
 .res .title.good{color:var(--good)}
 .res p{margin:0;font-size:.9rem;color:var(--muted);line-height:1.7}
+.res .learned{color:var(--accent);font-weight:700}
 .res .all{color:var(--good);font-weight:700}
 .acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
 .acts button{min-height:48px;font:700 .95rem var(--body);border-radius:14px;padding:8px 10px;cursor:pointer;border:2px solid var(--line);background:transparent;color:var(--fg)}
@@ -173,12 +176,17 @@ dialog.sheet[open]::backdrop{animation:fade .28s ease-out}
 .slot .n{font-family:var(--mono);font-size:.68rem;color:var(--muted)}
 .slot .t{font-size:.82rem;font-weight:700;line-height:1.3}
 .slot.lock{background:transparent;border-style:dashed}
+.slot .lm{margin-left:4px;padding:0 4px;border-radius:4px;border:1px solid var(--accent);color:var(--accent);font:700 .6rem/1.5 var(--ui)}
 .slot.lock .t{color:var(--muted);letter-spacing:.2em}
 .slot.just{border-color:var(--bad);box-shadow:0 0 0 2px color-mix(in srgb,var(--bad) 30%,transparent)}
 button.slot{font:inherit;color:var(--fg);text-align:left;cursor:pointer}
 .slot.sel{border:2px solid var(--fg)}
 .hint{margin-top:4px;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:flex;flex-direction:column;gap:3px;font-size:.9rem;line-height:1.5;min-height:2.6em}
 .hint .lbl{font-family:var(--mono);font-size:.72rem;color:var(--muted)}
+.lrow{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:.85rem;color:var(--muted)}
+.lrow b{font-family:var(--mono);color:var(--fg)}
+.lrow .reset{align-self:auto}
+.lrow .reset:disabled{opacity:.4;cursor:default;text-decoration:none}
 .reset{align-self:flex-end;min-height:44px;font:500 .75rem var(--body);background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0 4px}
 @media (prefers-reduced-motion:reduce){.caret,.pop,.sent,.shake,dialog.sheet[open],dialog.sheet[open]::backdrop{animation:none}}
 </style>
@@ -190,6 +198,7 @@ button.slot{font:inherit;color:var(--fg);text-align:left;cursor:pointer}
   </header>
   <p class="lead">キーボードが壊れて、予測変換しか押せない。しかもこのスマホは予測しすぎる。返信して、全部のエンディングを見つけよう。</p>
   <nav class="rooms" id="rooms" aria-label="返信する相手を選ぶ"></nav>
+  <div class="lrow"><span id="lstat"></span><button class="reset" id="lreset">学習をリセット</button></div>
 </div>
 <main id="game" hidden></main>
 
@@ -219,20 +228,25 @@ const esc=s=>s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const $=id=>document.getElementById(id);
 
 // ステージの中身は data/stages/*.json にある。順番は data/stages.json の order。
-let STAGES=[];
+let STAGES=[],WORDS=[];
 async function loadStages(){
-  const {order}=await (await fetch("data/stages.json")).json();
+  const {order,words}=await (await fetch("data/stages.json")).json();
+  WORDS=words||[];
   STAGES=await Promise.all(order.map(async id=>{
     const d=await (await fetch(`data/stages/${id}.json`)).json();
-    return {...d,E:d.endings.map(e=>[e.title,e.reply,e.comment,e.hint,e.good]),N:d.nodes};
+    return {...d,E:d.endings.map(e=>[e.title,e.reply,e.comment,e.hint,e.good,e.hidden]),N:d.nodes};
   }));
 }
 
-let st=0,path=["s"],done=null,isNew=false,sel=null,found=[];
+let st=0,path=["s"],done=null,isNew=false,sel=null,found=[],learned=new Set(),newWords=[]; // learned＝スマホが覚えた言葉、newWords＝今回の送信で新しく覚えた言葉
 let cur=null,timer=0,pend=false; // cur＝表示中の画面（""＝一覧、id＝トーク）。timer/pend＝送信後に結果モーダルを出す待ち
 const keyOf=i=>"yomisugi-endings-"+STAGES[i].id;
 const initFound=()=>STAGES.forEach((S,i)=>{let f=[];try{f=JSON.parse(localStorage.getItem(keyOf(i))||"[]")}catch(e){}found[i]=new Set(f)});
 const save=()=>{try{localStorage.setItem(keyOf(st),JSON.stringify([...found[st]]))}catch(e){}};
+const LKEY="yomisugi-learned";
+const initLearned=()=>{let l=[];try{l=JSON.parse(localStorage.getItem(LKEY)||"[]")}catch(e){}learned=new Set(Array.isArray(l)?l.filter(w=>WORDS.includes(w)):[])};
+const saveLearned=()=>{try{localStorage.setItem(LKEY,JSON.stringify([...learned]))}catch(e){}};
+const candsOf=n=>(n.c||[]).filter(c=>!c[2]||learned.has(c[2])); // 学習候補は覚えている言葉のものだけ出す
 const game=$("game"),list=$("list"),res=$("res"),zk=$("zk");
 
 function bubble(m){
@@ -257,6 +271,7 @@ const focusTalk=()=>{const t=$("retry")||game.querySelector(".cand");if(t&&!game
 function renderList(){
   const tot=STAGES.reduce((a,s,i)=>a+found[i].size,0),all=STAGES.reduce((a,s)=>a+s.E.length,0);
   $("count").innerHTML=`<b>${tot}</b> / ${all}`;
+  $("lstat").innerHTML=`スマホの学習: <b>${learned.size}/${WORDS.length}</b>`;$("lreset").disabled=!learned.size;
   $("rooms").innerHTML=STAGES.map((S,i)=>{const n=found[i].size,m=S.E.length;
     return `<a class="room" href="#${encodeURIComponent(S.id)}" data-i="${i}"><span class="rav" style="background:${S.color}" aria-hidden="true">${esc(S.who[0])}</span>
       <span class="rb"><span class="rn">${esc(S.who)}</span><span class="rl">${esc(S.ask)}</span></span>
@@ -275,11 +290,11 @@ function drawGallery(){
   $("zwho").textContent=S.who;
   $("grid").innerHTML=S.E.map((e,i)=>{
     const got=F.has(i),just=done!=null&&S.N[path.at(-1)].e===i;
-    return `<button class="slot ${got?"":"lock"} ${just?"just":""} ${sel===i?"sel":""}" data-i="${i}"><span class="n">${no(i)}</span><span class="t">${got?esc(e[0]):"？？？"}</span></button>`}).join("");
+    return `<button class="slot ${got?"":"lock"} ${just?"just":""} ${sel===i?"sel":""}" data-i="${i}"><span class="n">${no(i)}${e[5]&&!got?'<span class="lm">学習</span>':""}</span><span class="t">${got?esc(e[0]):"？？？"}</span></button>`}).join("");
   const h=$("hint");
   if(sel==null)h.innerHTML='<span class="tag">枠をタップすると、ヒントや相手の返信が見られます</span>';
   else if(F.has(sel))h.innerHTML=`<span class="lbl">${no(sel)}　${esc(S.E[sel][0])}</span><span>${esc(S.who)}「${esc(S.E[sel][1])}」</span>`;
-  else h.innerHTML=`<span class="lbl">${no(sel)}　ヒント</span><span>${esc(S.E[sel][3])}</span>`;
+  else h.innerHTML=`<span class="lbl">${no(sel)}　ヒント${S.E[sel][5]?"（スマホの学習が必要）":""}</span><span>${esc(S.E[sel][3])}</span>`;
   document.querySelectorAll("#grid .slot").forEach(b=>b.onclick=()=>{const i=+b.dataset.i;sel=sel===i?null:i;drawGallery();const n=$("grid").querySelector(`[data-i="${i}"]`);if(n)n.focus()});
 }
 function openZukan(back){clearArm();drawGallery();openDlg(zk,back||focusTalk)}
@@ -295,7 +310,8 @@ function renderTalk(pop){
   }
   const input=done!=null?'<span class="ph">メッセージを入力</span>':esc(node.t)+'<span class="caret"></span>';
   const btn=done!=null?'<button class="retry" id="retry">もう一度</button>':`<button class="sendb" id="send" aria-label="この文で送信" ${node.t?"":"disabled"}>➤</button>`;
-  const bar=done!=null?"":(node.c||[]).map((c,i)=>`<button class="cand ${pop?"pop":""}" data-i="${i}">${esc(c[0])}</button>`).join("")||'<span class="tag" style="padding:8px">これ以上の候補はありません</span>';
+  const cands=candsOf(node); // onclick もこのフィルタ後の配列で組む（i がずれないように）
+  const bar=done!=null?"":cands.map((c,i)=>`<button class="cand ${c[2]?"learn":""} ${pop?"pop":""}" data-i="${i}">${esc(c[0])}${c[2]?'<span class="lt">学習</span>':""}</button>`).join("")||'<span class="tag" style="padding:8px">これ以上の候補はありません</span>';
   const keys=KEYS.map(k=>k==="⌫"?`<button class="bs" id="bs" aria-label="1つ戻す" ${done==null&&path.length>1?"":"disabled"}>⌫</button>`:`<span class="${k.length>1?"fn":""}" aria-hidden="true">${k}</span>`).join("");
   game.innerHTML=`<div class="phone">
     <div class="top"><button class="back" id="back" aria-label="トーク一覧に戻る">‹</button><span class="name">${esc(S.who)}</span><span class="icons" aria-hidden="true">${ICON.search}${ICON.call}</span><button class="zbtn" id="zbtn">図鑑 <b>${found[st].size}/${S.E.length}</b></button></div>
@@ -305,11 +321,12 @@ function renderTalk(pop){
     <div class="keys broken">${keys}<div class="broken-tag" aria-hidden="true"><i>キーボード故障中</i></div></div>
   </div>`;
   const t=$("talk");t.scrollTop=t.scrollHeight;
-  game.querySelectorAll(".bar .cand").forEach(b=>b.onclick=()=>{path.push(node.c[+b.dataset.i][1]);renderTalk(true)});
+  game.querySelectorAll(".bar .cand").forEach(b=>b.onclick=()=>{path.push(cands[+b.dataset.i][1]);renderTalk(true)});
   $("back").onclick=goList;
   $("zbtn").onclick=()=>{if(timer){clearTimeout(timer);timer=0;pend=true}openZukan()};
   const u=$("bs");if(u)u.onclick=()=>{path.pop();renderTalk(true);const b=$("bs");if(b&&!b.disabled)b.focus()};
-  const s=$("send");if(s)s.onclick=()=>{done=node.e;isNew=!found[st].has(node.e);found[st].add(node.e);save();renderTalk(false);
+  const s=$("send");if(s)s.onclick=()=>{done=node.e;isNew=!found[st].has(node.e);found[st].add(node.e);save();
+    newWords=WORDS.filter(w=>!learned.has(w)&&node.t.includes(w));if(newWords.length){newWords.forEach(w=>learned.add(w));saveLearned()}renderTalk(false);
     clearTimeout(timer);timer=setTimeout(()=>{timer=0;showResult()},800)};
   const r=$("retry");if(r)r.onclick=retry;
 }
@@ -326,6 +343,7 @@ function showResult(){
   $("resbody").innerHTML=`<div class="grip" aria-hidden="true"></div>
     <div class="no"><span>${no(node.e)}</span>${isNew?'<span class="new">NEW</span>':'<span>発見済み</span>'}</div>
     <h2 class="title ${e[4]?"good":""}" id="restitle">${esc(e[0])}</h2><p>${esc(e[2])}</p>
+    ${newWords.length?`<p class="learned">📱 スマホが${newWords.map(w=>"「"+esc(w)+"」").join("")}を覚えた</p>`:""}
     ${complete?'<p class="all">この相手は全エンディング達成！</p>':""}
     <div class="acts"><button id="share">シェア</button><button class="pri" id="again">もう一度</button>
     <button id="tozk">図鑑を見る</button><button id="tolist">相手を選ぶ</button></div>`;
@@ -365,7 +383,16 @@ resetBtn.onclick=()=>{
   clearArm();clearTimeout(timer);timer=0;pend=false;found[st]=new Set();save();path=["s"];done=null;sel=null;
   renderTalk(false);drawGallery();renderList(); // 一覧の達成数とヘッダーの「図鑑 n/m」も更新する
 };
-loadStages().then(()=>{initFound();route()}).catch(err=>{
+// 学習のリセット（記録リセットと同じ2回押し方式）
+let lArmed=false,lArmT=0;
+const lreset=$("lreset");
+function clearLArm(){lArmed=false;clearTimeout(lArmT);lreset.textContent="学習をリセット"}
+lreset.onclick=()=>{
+  if(!learned.size)return;
+  if(!lArmed){lArmed=true;lreset.textContent="本当に消す？もう一度押す";lArmT=setTimeout(clearLArm,3000);return}
+  clearLArm();learned=new Set();saveLearned();renderList();
+};
+loadStages().then(()=>{initFound();initLearned();route()}).catch(err=>{
   $("rooms").innerHTML=`<div class="result"><p>ステージのデータを読み込めませんでした。ファイルを直接開いている場合は、README の「手元で動かす」の手順でローカルサーバーから開いてください。</p><p class="tag">${esc(String(err))}</p></div>`;
 });
 </script>
