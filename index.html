@@ -76,6 +76,7 @@ h1 span{background:linear-gradient(transparent 62%,var(--mark) 62%);color:var(--
 .rc{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.8rem}
 .rc .ok{color:var(--good);font-weight:700}
 .badge{background:var(--bad);color:var(--sheet);border-radius:10px;padding:1px 8px;font:700 .68rem var(--ui);line-height:1.5}
+.rphone{font-size:.78rem;line-height:1.5;cursor:help} /* 覚えた言葉で見られるエンディングの目印 */
 
 /* トーク画面（全画面）。PC では幅420px・高さ min(100dvh,860px) で中央に置く */
 #game{display:flex;justify-content:center;align-items:center;min-height:100vh;min-height:100dvh}
@@ -285,6 +286,17 @@ $("zclose").onclick=()=>zk.close();
 const focusTalk=()=>{const t=$("retry")||game.querySelector(".cand");if(t&&!game.hidden)t.focus()};
 
 // 一覧
+// 今覚えている言葉だけで、まだ見つけていない hidden エンディングに s からたどり着けるか
+function canSeeHidden(i){
+  const S=STAGES[i],want=new Set();
+  S.E.forEach((e,k)=>{if(e[5]&&!found[i].has(k))want.add(k)});
+  if(!want.size)return false;
+  const seen=new Set(["s"]),q=["s"]; // 幅優先。candsOf と同じフィルタで進む（循環しても止まる）
+  while(q.length){const n=S.N[q.shift()];if(!n)continue;
+    if(want.has(n.e))return true;
+    candsOf(n).forEach(c=>{if(!seen.has(c[1])){seen.add(c[1]);q.push(c[1])}});}
+  return false;
+}
 function renderList(){
   const tot=STAGES.reduce((a,s,i)=>a+found[i].size,0),all=STAGES.reduce((a,s)=>a+s.E.length,0);
   $("count").innerHTML=`<b>${tot}</b> / ${all}`;
@@ -294,7 +306,7 @@ function renderList(){
   $("rooms").innerHTML=STAGES.map((S,i)=>{const n=found[i].size,m=S.E.length;
     return `<a class="room" href="#${encodeURIComponent(S.id)}" data-i="${i}"><span class="rav" style="background:${S.color}" aria-hidden="true">${esc(S.who[0])}</span>
       <span class="rb"><span class="rn">${esc(S.who)}</span><span class="rl">${esc(S.ask)}</span></span>
-      <span class="rm"><span class="rt">${esc(S.askAt)}</span><span class="rc">${n===m?'<span class="ok" aria-label="全部見つけた">✓</span>':""}<span>${n}/${m}</span>${n?"":'<span class="badge">NEW</span>'}</span></span></a>`}).join("");
+      <span class="rm"><span class="rt">${esc(S.askAt)}</span><span class="rc">${canSeeHidden(i)?'<span class="rphone" role="img" aria-label="覚えた言葉で見られるエンディングがあります" title="覚えた言葉で見られるエンディングがあります">📱</span>':""}${n===m?'<span class="ok" aria-label="全部見つけた">✓</span>':""}<span>${n}/${m}</span>${n?"":'<span class="badge">NEW</span>'}</span></span></a>`}).join("");
   // 一覧から入ったことを履歴に残す（‹ で history.back() できるように）
   $("rooms").querySelectorAll(".room").forEach(a=>a.onclick=e=>{
     if(e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
