@@ -76,7 +76,7 @@ h1 span{background:linear-gradient(transparent 62%,var(--mark) 62%);color:var(--
 .rc{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.8rem}
 .rc .ok{color:var(--good);font-weight:700}
 .badge{background:var(--bad);color:var(--sheet);border-radius:10px;padding:1px 8px;font:700 .68rem var(--ui);line-height:1.5}
-.rphone{font-size:.78rem;line-height:1.5;cursor:help} /* 覚えた言葉で見られるエンディングの目印 */
+.rphone{border:1.5px solid var(--accent);color:var(--accent);border-radius:10px;padding:0 7px;font:700 .68rem var(--ui);line-height:1.5;white-space:nowrap;cursor:help} /* 覚えた言葉で見られるエンディングの目印 */
 
 /* トーク画面（全画面）。PC では幅420px・高さ min(100dvh,860px) で中央に置く */
 #game{display:flex;justify-content:center;align-items:center;min-height:100vh;min-height:100dvh}
@@ -306,7 +306,7 @@ function renderList(){
   $("rooms").innerHTML=STAGES.map((S,i)=>{const n=found[i].size,m=S.E.length;
     return `<a class="room" href="#${encodeURIComponent(S.id)}" data-i="${i}"><span class="rav" style="background:${S.color}" aria-hidden="true">${esc(S.who[0])}</span>
       <span class="rb"><span class="rn">${esc(S.who)}</span><span class="rl">${esc(S.ask)}</span></span>
-      <span class="rm"><span class="rt">${esc(S.askAt)}</span><span class="rc">${canSeeHidden(i)?'<span class="rphone" role="img" aria-label="覚えた言葉で見られるエンディングがあります" title="覚えた言葉で見られるエンディングがあります">📱</span>':""}${n===m?'<span class="ok" aria-label="全部見つけた">✓</span>':""}<span>${n}/${m}</span>${n?"":'<span class="badge">NEW</span>'}</span></span></a>`}).join("");
+      <span class="rm"><span class="rt">${esc(S.askAt)}</span><span class="rc">${canSeeHidden(i)?'<span class="rphone" role="img" aria-label="覚えた言葉で見られるエンディングがあります" title="覚えた言葉で見られるエンディングがあります">📱あり</span>':""}${n===m?'<span class="ok" aria-label="全部見つけた">✓</span>':""}<span>${n}/${m}</span>${n?"":'<span class="badge">NEW</span>'}</span></span></a>`}).join("");
   // 一覧から入ったことを履歴に残す（‹ で history.back() できるように）
   $("rooms").querySelectorAll(".room").forEach(a=>a.onclick=e=>{
     if(e.button||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;
