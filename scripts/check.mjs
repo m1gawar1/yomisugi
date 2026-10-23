@@ -55,6 +55,8 @@ for (const id of order) {
   if (N.s.t !== "") err(id, "ノード s の t は空文字にしてください");
   for (const [k, n] of Object.entries(N)) {
     if (typeof n.t !== "string") err(id, `ノード ${k} に t（入力中の文）がありません`);
+    if (n.r != null && (typeof n.r !== "string" || !n.r)) err(id, `ノード ${k} の r（専用の返信）は空でない文字列にしてください`);
+    if (n.r != null && E[n.e]?.title !== "途中送信") warn(id, `ノード ${k} の r は途中送信のノードにだけ付けてください（今は END ${n.e + 1}）`);
     if (k !== "s" && n.e == null) err(id, `ノード ${k} に e（送信したときのエンディング番号）がありません`);
     if (n.e != null && !(Number.isInteger(n.e) && n.e >= 0 && n.e < E.length)) err(id, `ノード ${k} の e=${n.e} は存在しないエンディングです（0〜${E.length - 1}）`);
     if (!n.c?.length && n.e == null) err(id, `ノード ${k} は候補も送信先もない行き止まりです`);

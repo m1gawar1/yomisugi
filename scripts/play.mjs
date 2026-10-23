@@ -76,7 +76,7 @@ if (cmd === "list") {
   save();
   console.log(`${S.who}「${S.ask}」（${S.askAt}）`);
   console.log(`自分: ${node.t}（既読 ${S.sentAt}）`);
-  console.log(`${S.who}: ${e.reply}`);
+  console.log(`${S.who}: ${node.r || e.reply}`);
   console.log(`${no(node.e)}｜${e.title}｜${isNew ? "NEW" : "発見済み"}`);
   console.log(`一言: ${e.comment}`);
   console.log(`図鑑 ${F.size}/${S.endings.length}`);

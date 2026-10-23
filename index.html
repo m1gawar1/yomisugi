@@ -325,7 +325,7 @@ function renderTalk(pop){
   let log=bubble({...P,t:S.ask,at:S.askAt});
   if(done!=null){
     log+=bubble({mine:true,t:node.t,at:S.sentAt,read:true,cls:"sent"});
-    log+=bubble({...P,t:S.E[node.e][1],at:S.sentAt,cls:"sent"});
+    log+=bubble({...P,t:node.r||S.E[node.e][1],at:S.sentAt,cls:"sent"}); // r があればそのノード専用の返信
   }
   const input=done!=null?'<span class="ph">メッセージを入力</span>':esc(node.t)+'<span class="caret"></span>';
   const btn=done!=null?'<button class="retry" id="retry">もう一度</button>':`<button class="sendb" id="send" aria-label="この文で送信" ${node.t?"":"disabled"}>➤</button>`;
