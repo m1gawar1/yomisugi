@@ -12,6 +12,7 @@ data/stages/mom.json    ステージ1：お母さん
 data/stages/boss.json   ステージ2：佐藤部長
 data/stages/ex.json     ステージ3：元カノ
 data/stages/kenta.json  ステージ4：親友
+data/stages/yui.json    ステージ5：彼女
 scripts/check.mjs       データの自動チェック
 scripts/play.mjs        テストプレイ用の CLI（データを見ずに遊べる）
 CLAUDE.md               Claude Code 向けの作業ルール
