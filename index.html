@@ -187,6 +187,9 @@ button.slot{font:inherit;color:var(--fg);text-align:left;cursor:pointer}
 .lrow b{font-family:var(--mono);color:var(--fg)}
 .lrow .reset{align-self:auto}
 .lrow .reset:disabled{opacity:.4;cursor:default;text-decoration:none}
+.wchips{display:flex;flex-wrap:wrap;gap:6px;margin:0;padding:0;list-style:none}
+.wchips li{padding:4px 10px;border-radius:999px;font-size:.8rem;line-height:1.5;background:var(--sheet);border:1px solid var(--line);color:var(--muted);overflow-wrap:anywhere}
+.wchips li.got{color:var(--accent);border-color:var(--accent);font-weight:700}
 .reset{align-self:flex-end;min-height:44px;font:500 .75rem var(--body);background:none;border:0;color:var(--muted);text-decoration:underline;cursor:pointer;padding:0 4px}
 @media (prefers-reduced-motion:reduce){.caret,.pop,.sent,.shake,dialog.sheet[open],dialog.sheet[open]::backdrop{animation:none}}
 </style>
@@ -199,6 +202,7 @@ button.slot{font:inherit;color:var(--fg);text-align:left;cursor:pointer}
   <p class="lead">キーボードが壊れて、予測変換しか押せない。しかもこのスマホは予測しすぎる。返信して、全部のエンディングを見つけよう。</p>
   <nav class="rooms" id="rooms" aria-label="返信する相手を選ぶ"></nav>
   <div class="lrow"><span id="lstat"></span><button class="reset" id="lreset">学習をリセット</button></div>
+  <ul class="wchips" id="wchips" aria-label="スマホが覚えた言葉"></ul>
 </div>
 <main id="game" hidden></main>
 
@@ -271,7 +275,9 @@ const focusTalk=()=>{const t=$("retry")||game.querySelector(".cand");if(t&&!game
 function renderList(){
   const tot=STAGES.reduce((a,s,i)=>a+found[i].size,0),all=STAGES.reduce((a,s)=>a+s.E.length,0);
   $("count").innerHTML=`<b>${tot}</b> / ${all}`;
-  $("lstat").innerHTML=`スマホの学習: <b>${learned.size}/${WORDS.length}</b>`;$("lreset").disabled=!learned.size;
+  $("lstat").innerHTML=`📱 スマホが覚えた言葉 <b>${learned.size}/${WORDS.length}</b>`;
+  $("wchips").innerHTML=WORDS.map(w=>learned.has(w)?`<li class="got">${esc(w)}</li>`:'<li>？？？</li>').join(""); // 未習得は伏せ字（ネタバレ防止）
+  $("lreset").disabled=!learned.size;
   $("rooms").innerHTML=STAGES.map((S,i)=>{const n=found[i].size,m=S.E.length;
     return `<a class="room" href="#${encodeURIComponent(S.id)}" data-i="${i}"><span class="rav" style="background:${S.color}" aria-hidden="true">${esc(S.who[0])}</span>
       <span class="rb"><span class="rn">${esc(S.who)}</span><span class="rl">${esc(S.ask)}</span></span>
