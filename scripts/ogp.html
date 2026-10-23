@@ -1,0 +1,54 @@
+<!doctype html>
+<!-- OGP 画像（og.png・1200×630）の元。作り直すときは README の「OGP 画像」の手順で書き出す -->
+<html lang="ja">
+<meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700&display=swap">
+<style>
+:root{
+  --bg:#eef0f3; --fg:#1d2230; --muted:#6b7282; --mark:#ffe14d;
+  --talk:#8aa6cf; --head:#2b3445; --mine:#8de055; --minefg:#13200a; --theirs:#ffffff;
+  --display:"Dela Gothic One","Hiragino Sans","Noto Sans JP",sans-serif;
+  --body:"Zen Maru Gothic","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;
+}
+html,body{margin:0}
+body{width:1200px;height:630px;overflow:hidden;background:var(--bg);color:var(--fg);font-family:var(--body);
+  display:flex;align-items:center;gap:48px;padding:0 64px;box-sizing:border-box}
+/* 左：ロゴとキャッチ */
+.left{flex:1}
+h1{font-family:var(--display);font-weight:400;font-size:112px;margin:0;letter-spacing:.02em;line-height:1.3}
+h1 span{background:linear-gradient(transparent 62%,var(--mark) 62%)}
+.copy{font-family:var(--display);font-size:36px;line-height:1.5;margin:28px 0 0;font-feature-settings:"palt" 1}
+.sub{font-size:26px;line-height:1.7;color:var(--muted);margin:18px 0 0;font-weight:700;letter-spacing:.04em}
+/* 右：誤爆したトーク画面 */
+.phone{width:480px;height:540px;border-radius:36px;background:var(--talk);overflow:hidden;
+  box-shadow:0 18px 40px rgba(29,34,48,.22);display:flex;flex-direction:column}
+.top{background:var(--head);color:#fff;font-weight:700;font-size:26px;padding:22px 28px}
+.talk{flex:1;padding:26px 22px;display:flex;flex-direction:column;gap:22px}
+.row{display:flex;gap:12px;align-items:flex-start}
+.row.mine{justify-content:flex-end}
+.av{flex:none;width:52px;height:52px;border-radius:50%;background:#e8915a;color:#fff;font-weight:700;font-size:24px;display:grid;place-items:center}
+.b{padding:14px 20px;border-radius:24px;font-size:28px;line-height:1.5;font-weight:700;max-width:300px}
+.theirs .b{background:var(--theirs);border-top-left-radius:6px}
+.mine .b{background:var(--mine);color:var(--minefg);border-top-right-radius:6px}
+.b{white-space:nowrap;max-width:none}
+/* 下：予測変換の候補バー */
+.bar{background:#d6dae1;padding:16px 14px;display:flex;gap:10px}
+.bar span{background:#fff;border-radius:10px;padding:10px 16px;font-size:24px;font-weight:700;white-space:nowrap}
+.bar .hot{box-shadow:inset 0 0 0 3px #2c5bd9;background:#e3ebff}
+.read{align-self:flex-end;font-size:18px;color:#fff;font-weight:700;line-height:1.3;text-align:right}
+</style>
+<div class="left">
+  <h1><span>ヨミスギ</span></h1>
+  <p class="copy">キーボードが壊れて、<br>予測変換しか押せない。</p>
+  <p class="sub">しかもこのスマホは予測しすぎる。<br>返信して、エンディングを集めよう。</p>
+</div>
+<div class="phone" aria-hidden="true">
+  <div class="top">‹　お母さん</div>
+  <div class="talk">
+    <div class="row theirs"><div class="av">お</div><div class="b">今日何時ごろ帰る？</div></div>
+    <div class="row mine"><div class="read">既読<br>18:42</div><div class="b">今日の合コン楽しみ</div></div>
+    <div class="row theirs"><div class="av">お</div><div class="b">送る相手間違えてない？</div></div>
+  </div>
+  <div class="bar"><span>は</span><span class="hot">の合コン</span><span>彼女と</span><span>も</span></div>
+</div>
+</html>

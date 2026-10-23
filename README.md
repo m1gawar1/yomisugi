@@ -15,6 +15,8 @@ data/stages/kenta.json  ステージ4：親友
 data/stages/yui.json    ステージ5：彼女
 scripts/check.mjs       データの自動チェック
 scripts/play.mjs        テストプレイ用の CLI（データを見ずに遊べる）
+scripts/ogp.html        OGP 画像（og.png）の元
+og.png                  リンクを貼ったときのカード画像（1200×630）
 CLAUDE.md               Claude Code 向けの作業ルール
 ```
 
@@ -95,6 +97,16 @@ node scripts/check.mjs
 2. `data/stages.json` の `order` に id を足す
 3. `node scripts/check.mjs` でチェック
 4. ローカルサーバーで遊んで確認
+
+## OGP 画像を作り直す
+
+`scripts/ogp.html` を直して、Chrome のヘッドレスで書き出す（Windows・Git Bash の例）。
+
+```
+"/c/Program Files/Google/Chrome/Application/chrome.exe" --headless=new --hide-scrollbars \n  --force-device-scale-factor=1 --window-size=1200,630 --virtual-time-budget=5000 \n  --screenshot="$(cygpath -w "$PWD")\og.png" "file:///$(cygpath -m "$PWD")/scripts/ogp.html"
+```
+
+SNS はカード画像をキャッシュするので、差し替えてもすぐには変わらないことがある。
 
 ## GitHub Pages で公開する
 
