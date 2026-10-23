@@ -103,7 +103,9 @@ node scripts/check.mjs
 `scripts/ogp.html` を直して、Chrome のヘッドレスで書き出す（Windows・Git Bash の例）。
 
 ```
-"/c/Program Files/Google/Chrome/Application/chrome.exe" --headless=new --hide-scrollbars \n  --force-device-scale-factor=1 --window-size=1200,630 --virtual-time-budget=5000 \n  --screenshot="$(cygpath -w "$PWD")\og.png" "file:///$(cygpath -m "$PWD")/scripts/ogp.html"
+"/c/Program Files/Google/Chrome/Application/chrome.exe" --headless=new --hide-scrollbars \
+  --force-device-scale-factor=1 --window-size=1200,630 --virtual-time-budget=5000 \
+  --screenshot="$(cygpath -w "$PWD")\og.png" "file:///$(cygpath -m "$PWD")/scripts/ogp.html"
 ```
 
 SNS はカード画像をキャッシュするので、差し替えてもすぐには変わらないことがある。
