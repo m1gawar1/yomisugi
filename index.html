@@ -65,6 +65,9 @@ body.talking{padding:0}
 .wrap .lrow,.wrap .wchips{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .lrow{margin-top:12px}
 .wchips{margin-top:8px}
+/* 一覧ページ（ポータル）へ戻るリンク */
+.portal{display:flex;align-items:center;min-height:44px;margin:20px 0 8px;padding:0 max(16px,env(safe-area-inset-left,0px));border-top:1px solid var(--line);color:var(--muted);font-size:.8rem;text-decoration:none}
+.portal:hover,.portal:focus-visible{color:var(--accent);text-decoration:underline}
 h1{font-family:var(--display);font-weight:400;font-size:1.15rem;line-height:1.4;margin:0;letter-spacing:.02em}
 h1 span{background:linear-gradient(transparent 62%,var(--mark) 62%);color:var(--fg)}
 .tag{font-size:.8rem;color:var(--muted)}
@@ -231,6 +234,7 @@ button.slot{font:inherit;color:var(--fg);text-align:left;cursor:pointer}
   <nav class="rooms" id="rooms" aria-label="返信する相手を選ぶ"></nav>
   <div class="lrow"><span id="lstat"></span><button class="reset" id="lreset">学習をリセット</button></div>
   <ul class="wchips" id="wchips" aria-label="スマホが覚えた言葉"></ul>
+  <a class="portal" href="https://m1gawar1.github.io/">← ほかのゲーム（m1gawar1 games）</a>
 </div>
 <main id="game" hidden></main>
 
