@@ -48,11 +48,24 @@
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{background:var(--bg);color:var(--fg)}
-body{margin:0;font-family:var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:max(20px,env(safe-area-inset-top,0px));padding-bottom:calc(32px + env(safe-area-inset-bottom,0px))}
+body{margin:0;font-family:var(--body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-top:0;padding-bottom:0}
 /* トーク画面のときだけ body の余白をなくす */
 body.talking{padding:0}
-.wrap{max-width:420px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
-h1{font-family:var(--display);font-weight:400;font-size:2rem;margin:0;letter-spacing:.02em}
+.wrap{max-width:430px;min-height:100vh;min-height:100dvh;margin:0 auto;background:var(--sheet);display:flex;flex-direction:column;padding-bottom:calc(24px + env(safe-area-inset-bottom,0px))}
+/* 広い画面ではアプリ画面のまとまりとして中央に置く（外枠は描かない） */
+@media (min-width:480px){.wrap{margin:24px auto;min-height:calc(100dvh - 48px);border-radius:20px;overflow:clip;box-shadow:0 8px 32px rgba(0,0,0,.18),0 0 0 1px var(--line)}}
+/* 一覧画面の紺ヘッダー（トーク画面の .top と同じ色） */
+.apphead{position:sticky;top:0;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:56px;background:var(--head);color:var(--headfg);font-family:var(--ui);padding:calc(8px + env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px))}
+.apphead h2{margin:0;font-size:1.25rem;font-weight:700;line-height:1.4;letter-spacing:.02em}
+.apphead .count{font-size:.8rem;opacity:.9;white-space:nowrap}
+.apphead .count b{font-size:1.05rem;font-weight:500}
+/* ヘッダー下の説明帯 */
+.intro{display:flex;flex-direction:column;gap:4px;padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));background:color-mix(in srgb,var(--fg) 4%,var(--sheet));border-bottom:1px solid var(--line)}
+.intro .lead{font-size:.75rem;line-height:1.7}
+.wrap .lrow,.wrap .wchips{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.lrow{margin-top:12px}
+.wchips{margin-top:8px}
+h1{font-family:var(--display);font-weight:400;font-size:1.15rem;line-height:1.4;margin:0;letter-spacing:.02em}
 h1 span{background:linear-gradient(transparent 62%,var(--mark) 62%);color:var(--fg)}
 .tag{font-size:.8rem;color:var(--muted)}
 .mission{background:var(--sheet);border:1px solid var(--line);border-radius:14px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
@@ -61,9 +74,9 @@ h1 span{background:linear-gradient(transparent 62%,var(--mark) 62%);color:var(--
 .copy{font-family:var(--display);font-size:1rem;line-height:1.5}
 
 /* トーク一覧（ステージ選択） */
-.rooms{display:flex;flex-direction:column;background:var(--sheet);border:1px solid var(--line);border-radius:16px;overflow:hidden;font-family:var(--ui)}
-.room{display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:72px;color:var(--fg);text-decoration:none;-webkit-tap-highlight-color:transparent}
-.room+.room{border-top:1px solid var(--line)}
+.rooms{display:flex;flex-direction:column;background:var(--sheet);font-family:var(--ui)}
+.room{display:flex;align-items:center;gap:12px;padding:12px max(16px,env(safe-area-inset-right,0px)) 12px max(16px,env(safe-area-inset-left,0px));min-height:72px;color:var(--fg);text-decoration:none;-webkit-tap-highlight-color:transparent}
+.room{border-bottom:1px solid var(--line)}
 .room:hover{background:color-mix(in srgb,var(--fg) 5%,var(--sheet))}
 .room:focus-visible{outline:3px solid var(--accent);outline-offset:-3px}
 .rav{flex:none;width:48px;height:48px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff}
@@ -157,9 +170,7 @@ button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .verdict.ok{color:var(--good)} .verdict.ng{color:var(--bad)} .verdict.leak{color:var(--warn)}
 .result p{margin:0;font-size:.9rem;line-height:1.6}
 
-header{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
-.count{font-family:var(--mono);font-size:.9rem}
-.count b{font-size:1.3rem}
+.count{font-family:var(--mono)}
 .lead{font-size:.85rem;color:var(--muted);line-height:1.7;margin:0}
 
 /* 下から出るシート（結果モーダル・図鑑） */
@@ -209,11 +220,14 @@ button.slot{font:inherit;color:var(--fg);text-align:left;cursor:pointer}
 </style>
 
 <div class="wrap" id="list">
-  <header>
-    <h1><span>ヨミスギ</span></h1>
-    <div class="count" id="count"></div>
+  <header class="apphead">
+    <h2>トーク</h2>
+    <div class="count" id="count" aria-label="集めたエンディング"></div>
   </header>
-  <p class="lead">キーボードが壊れて、予測変換しか押せない。しかもこのスマホは予測しすぎる。返信して、全部のエンディングを見つけよう。</p>
+  <div class="intro">
+    <h1><span>ヨミスギ</span></h1>
+    <p class="lead">キーボードが壊れて、予測変換しか押せない。しかもこのスマホは予測しすぎる。返信して、全部のエンディングを見つけよう。</p>
+  </div>
   <nav class="rooms" id="rooms" aria-label="返信する相手を選ぶ"></nav>
   <div class="lrow"><span id="lstat"></span><button class="reset" id="lreset">学習をリセット</button></div>
   <ul class="wchips" id="wchips" aria-label="スマホが覚えた言葉"></ul>
@@ -299,7 +313,7 @@ function canSeeHidden(i){
 }
 function renderList(){
   const tot=STAGES.reduce((a,s,i)=>a+found[i].size,0),all=STAGES.reduce((a,s)=>a+s.E.length,0);
-  $("count").innerHTML=`<b>${tot}</b> / ${all}`;
+  $("count").innerHTML=`<b>${tot}</b>/${all} END`;
   $("lstat").innerHTML=`📱 スマホが覚えた言葉 <b>${learned.size}/${WORDS.length}</b>`;
   $("wchips").innerHTML=WORDS.map(w=>learned.has(w)?`<li class="got">${esc(w)}</li>`:'<li>？？？</li>').join(""); // 未習得は伏せ字（ネタバレ防止）
   $("lreset").disabled=!learned.size;
